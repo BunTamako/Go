@@ -91,13 +91,13 @@
     <div class="tips">请稍候，正在为您加载页面</div>
   </div>
   <script>
-    // 先访问云函数计数
+    // 访问云函数计数接口
     fetch("https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run/get", {mode: "no-cors"})
-    .finally(function() {
-      setTimeout(function() {
-        window.location.href = "https://buntamako.github.io/Bun/";
-      }, 1200);
-    });
+      .finally(function() {
+        setTimeout(function() {
+          window.location.href = "https://buntamako.github.io/Bun/";
+        }, 1200);
+      });
   </script>
 </body>
 </html>
