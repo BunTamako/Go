@@ -92,13 +92,12 @@
   </div>
   <script>
     // 先访问云函数计数
-    fetch("https://1362167056-4cojydmh00.ap-shanghai.tencentscf.com/?action=count", {mode: "no-cors"})
-      .finally(function() {
-        // 不管计数请求是否完成，都自动跳转
-        setTimeout(function() {
-          window.location.href = "https://buntamako.github.io/Bun/";
-        }, 1200); // 增加1.2秒动画体验
-      });
+    fetch("https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run/get", {mode: "no-cors"})
+    .finally(function() {
+      setTimeout(function() {
+        window.location.href = "https://buntamako.github.io/Bun/";
+      }, 1200);
+    });
   </script>
 </body>
 </html>
