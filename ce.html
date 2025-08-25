@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>正在进入测试...</title>
   <style>
-    html, body {height: 100%; margin: 0; padding: 0;}
+    html, body { height: 100%; margin: 0; padding: 0; }
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
       overflow: hidden; position: relative;
     }
-    .waves {position: absolute; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 1;}
+    .waves { position: absolute; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 1; }
     .center-box {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
       z-index: 2; display: flex; flex-direction: column; align-items: center;
       width: 100vw; max-width: 400px; padding: 24px 12px; background: rgba(255,255,255,0.8);
       border-radius: 20px; box-shadow: 0 8px 32px rgba(160,180,200,0.22); backdrop-filter: blur(5px);
     }
-    .loading {margin-top: 10px; width: 60px; height: 60px; border: 6px solid #ACB6E5; border-top: 6px solid #74ebd5; border-radius: 50%; animation: spin 1s linear infinite;}
-    @keyframes spin {to { transform: rotate(360deg);}}
-    .title {font-size: 1.3rem; font-weight: bold; color: #305671; letter-spacing: 1px; margin-bottom: 18px; text-shadow: 0 2px 8px #fff9;}
-    .tips {color: #4676a3; font-size: 1rem; margin-top: 12px; opacity: .86; text-align: center; letter-spacing: .5px;}
-    @media (max-width: 520px) {.center-box {max-width: 96vw; padding: 18px 2vw;}}
+    .loading { margin-top: 10px; width: 60px; height: 60px; border: 6px solid #ACB6E5; border-top: 6px solid #74ebd5; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .title { font-size: 1.3rem; font-weight: bold; color: #305671; letter-spacing: 1px; margin-bottom: 18px; text-shadow: 0 2px 8px #fff9; }
+    .tips { color: #4676a3; font-size: 1rem; margin-top: 12px; opacity: .86; text-align: center; letter-spacing: .5px; }
+    @media (max-width: 520px) { .center-box { max-width: 96vw; padding: 18px 2vw; } }
   </style>
 </head>
 <body>
@@ -40,42 +40,35 @@
   </div>
 
   <script>
+    // —— 统一的内部类型键（英文） ↔ 中文网页名（仅用于注释/理解） ——
+    // bun     → 依恋类型测试
+    // mbti    → MBTI
+    // riasec  → 霍兰德职业类型
+    // burnout → 职业倦怠
+
     // 读取 URL 参数
     const params = new URLSearchParams(location.search);
-    const to = (params.get("to") || "").toLowerCase();
+    const to = (params.get("to") || "bun").toLowerCase(); // 默认跳 bun（依恋类型测试）
     const delayParam = parseInt(params.get("delay"), 10);
-    const delay = Number.isFinite(delayParam) ? Math.max(0, delayParam) : 1200;
+    const delay = Number.isFinite(delayParam) ? Math.max(0, delayParam) : 1000;
 
-    // 目标地址白名单映射（按需自行扩展）
+    // 目标地址白名单（只维护这里即可）
     const DEST_MAP = {
-      // 例如：?to=bun
-      bun: "https://buntamako.github.io/Bun/",
-      // 例如：?to=docs
-      docs: "https://www.baidu.com",
-      // 例如：?to=home
-      home: "https://example.com/",
-      // 默认目标（未传参或未知时）
-      default: "https://buntamako.github.io/Bun/"
+      bun: "https://buntamako.github.io/Bun/",            // 依恋类型测试
+      mbti: "https://example.com/mbti/",                  // TODO: 替换为真实 MBTI 地址
+      riasec: "https://example.com/riasec/",              // TODO: 替换为真实 霍兰德 地址
+      burnout: "https://example.com/burnout/"             // TODO: 替换为真实 职业倦怠 地址
     };
+    const targetUrl = DEST_MAP[to] || DEST_MAP.bun;
 
-    // 解析最终目标（只从白名单里取）
-    const targetUrl = DEST_MAP[to] || DEST_MAP.default;
-
-    // 告警：如果你确实想支持自定义 URL，可改成读取 ?url= 并做 startsWith 白名单校验：
-    // const raw = params.get("url");
-    // const ALLOWED_PREFIX = ["https://buntamako.github.io/", "https://example.com/"];
-    // const safe = raw && ALLOWED_PREFIX.some(p => raw.startsWith(p)) ? raw : DEST_MAP.default;
-
-    // 访问云函数计数接口（逻辑不变）
-    fetch("https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run/get", { mode: "no-cors" })
-      .catch(() => { /* 忽略统计失败 */ })
+    // 访问云函数计数接口（记录该类型一次访问）
+    // 注意：把下面的 YOUR_FUNCTION_URL 改成你的阿里云函数 HTTP 触发 URL 前缀
+    const FUNC_BASE = "https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run"; // 例如：https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run
+    fetch(`${FUNC_BASE}/get?to=${encodeURIComponent(to)}`, { mode: "no-cors" })
+      .catch(() => {}) // 忽略统计失败
       .finally(() => {
-        setTimeout(() => {
-          // 跳转到最终目标
-          window.location.href = targetUrl;
-        }, delay);
+        setTimeout(() => { window.location.href = targetUrl; }, delay);
       });
   </script>
 </body>
 </html>
-
