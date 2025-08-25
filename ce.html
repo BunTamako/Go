@@ -5,77 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>正在进入测试...</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
+    html, body {height: 100%; margin: 0; padding: 0;}
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-      /* 动态底纹 */
-      overflow: hidden;
-      position: relative;
+      overflow: hidden; position: relative;
     }
-    .waves {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 120px;
-      z-index: 1;
-    }
+    .waves {position: absolute; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 1;}
     .center-box {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -60%);
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100vw;
-      max-width: 400px;
-      padding: 24px 12px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(160,180,200,0.22);
-      backdrop-filter: blur(5px);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+      z-index: 2; display: flex; flex-direction: column; align-items: center;
+      width: 100vw; max-width: 400px; padding: 24px 12px; background: rgba(255,255,255,0.8);
+      border-radius: 20px; box-shadow: 0 8px 32px rgba(160,180,200,0.22); backdrop-filter: blur(5px);
     }
-    .loading {
-      margin-top: 10px;
-      width: 60px;
-      height: 60px;
-      border: 6px solid #ACB6E5;
-      border-top: 6px solid #74ebd5;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg);}
-    }
-    .title {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: #305671;
-      letter-spacing: 1px;
-      margin-bottom: 18px;
-      text-shadow: 0 2px 8px #fff9;
-    }
-    .tips {
-      color: #4676a3;
-      font-size: 1rem;
-      margin-top: 12px;
-      opacity: .86;
-      text-align: center;
-      letter-spacing: .5px;
-    }
-    @media (max-width: 520px) {
-      .center-box {
-        max-width: 96vw;
-        padding: 18px 2vw;
-      }
-    }
+    .loading {margin-top: 10px; width: 60px; height: 60px; border: 6px solid #ACB6E5; border-top: 6px solid #74ebd5; border-radius: 50%; animation: spin 1s linear infinite;}
+    @keyframes spin {to { transform: rotate(360deg);}}
+    .title {font-size: 1.3rem; font-weight: bold; color: #305671; letter-spacing: 1px; margin-bottom: 18px; text-shadow: 0 2px 8px #fff9;}
+    .tips {color: #4676a3; font-size: 1rem; margin-top: 12px; opacity: .86; text-align: center; letter-spacing: .5px;}
+    @media (max-width: 520px) {.center-box {max-width: 96vw; padding: 18px 2vw;}}
   </style>
 </head>
 <body>
@@ -85,18 +32,48 @@
       <animateTransform attributeName="transform" attributeType="XML" type="translate" from="0 0" to="60 0" dur="4s" repeatCount="indefinite"/>
     </path>
   </svg>
+
   <div class="center-box">
     <div class="title">正在进入测试…</div>
     <div class="loading"></div>
     <div class="tips">请稍候，正在为您加载页面</div>
   </div>
+
   <script>
-    // 访问云函数计数接口
-    fetch("https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run/get", {mode: "no-cors"})
-      .finally(function() {
-        setTimeout(function() {
-          window.location.href = "https://buntamako.github.io/Bun/";
-        }, 1200);
+    // 读取 URL 参数
+    const params = new URLSearchParams(location.search);
+    const to = (params.get("to") || "").toLowerCase();
+    const delayParam = parseInt(params.get("delay"), 10);
+    const delay = Number.isFinite(delayParam) ? Math.max(0, delayParam) : 1200;
+
+    // 目标地址白名单映射（按需自行扩展）
+    const DEST_MAP = {
+      // 例如：?to=bun
+      bun: "https://buntamako.github.io/Bun/",
+      // 例如：?to=docs
+      docs: "https://example.com/docs/",
+      // 例如：?to=home
+      home: "https://example.com/",
+      // 默认目标（未传参或未知时）
+      default: "https://buntamako.github.io/Bun/"
+    };
+
+    // 解析最终目标（只从白名单里取）
+    const targetUrl = DEST_MAP[to] || DEST_MAP.default;
+
+    // 告警：如果你确实想支持自定义 URL，可改成读取 ?url= 并做 startsWith 白名单校验：
+    // const raw = params.get("url");
+    // const ALLOWED_PREFIX = ["https://buntamako.github.io/", "https://example.com/"];
+    // const safe = raw && ALLOWED_PREFIX.some(p => raw.startsWith(p)) ? raw : DEST_MAP.default;
+
+    // 访问云函数计数接口（逻辑不变）
+    fetch("https://counter-api-nbfmmbppre.cn-hangzhou.fcapp.run/get", { mode: "no-cors" })
+      .catch(() => { /* 忽略统计失败 */ })
+      .finally(() => {
+        setTimeout(() => {
+          // 跳转到最终目标
+          window.location.href = targetUrl;
+        }, delay);
       });
   </script>
 </body>
